@@ -16,13 +16,14 @@ function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement) {
   return field.id && field.value !== field.defaultValue && field.form !== submittedForm
 }
 
-// Write all ids and values of the js-session-resumable fields on the page into
-// sessionStorage.
-export function persistResumableFields(id: string) {
+type Options = {|selector: string|}
+
+// Write all ids and values of the selected fields on the page into sessionStorage.
+export function persistResumableFields(id: string, {selector = '.js-session-resumable'}: Options) {
   const key = `session-resume:${id}`
   const resumables = []
 
-  for (const el of document.querySelectorAll('.js-session-resumable')) {
+  for (const el of document.querySelectorAll(selector)) {
     if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
       resumables.push(el)
     }
