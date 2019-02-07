@@ -16,11 +16,11 @@ function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement) {
   return field.id && field.value !== field.defaultValue && field.form !== submittedForm
 }
 
-type Options = {|selector: string|}
+type PersistOptions = {|selector: string, keyPrefix: string|}
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
-export function persistResumableFields(id: string, {selector = '.js-session-resumable'}: Options) {
-  const key = `session-resume:${id}`
+export function persistResumableFields(id: string, {selector = '.js-session-resumable', keyPrefix = 'session-resume:'}: PersistOptions = {}) {
+  const key = `${keyPrefix}${id}`
   const resumables = []
 
   for (const el of document.querySelectorAll(selector)) {
@@ -40,8 +40,10 @@ export function persistResumableFields(id: string, {selector = '.js-session-resu
   }
 }
 
-export async function restoreResumableFields(id: string) {
-  const key = `session-resume:${id}`
+type RestoreOptions = {|keyPrefix: string|}
+
+export async function restoreResumableFields(id: string, {keyPrefix = 'session-resume:'}: RestoreOptions = {}) {
+  const key = `${keyPrefix}${id}`
   let fields
 
   try {
