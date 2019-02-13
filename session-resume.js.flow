@@ -2,6 +2,6 @@
 
 declare module.exports: {
   setForm(event: Event): void;
-  restoreResumableFields(id: string): void;
-  persistResumableFields(id: string): void;
+  restoreResumableFields(id: string, options?: {keyPrefix?: string}): void;
+  persistResumableFields(id: string, options?: {selector?: string, keyPrefix?: string}): void;
 };
