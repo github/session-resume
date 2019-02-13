@@ -1,0 +1,7 @@
+/* @flow strict */
+
+declare module.exports: {
+  setForm(event: Event): void;
+  restoreResumableFields(id: string): void;
+  persistResumableFields(id: string): void;
+};
