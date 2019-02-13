@@ -29,20 +29,16 @@ describe('session-resume', function() {
       assert.deepEqual(fieldsRestored, {'my-first-field': 'test2'})
     })
 
-    it('fires off session:resume events for changed fields' , async function() {
+    it('fires off change for changed fields', function(done) {
       let changedFieldsIds = []
       for (const input of document.querySelectorAll('input')) {
         input.addEventListener('change', function(event) {
-          changedFieldsIds.push(event.target.id)
+          done(assert.equal(event.target.id, 'my-first-field'))
         })
       }
 
       sessionStorage.setItem('session-resume:test-persist', JSON.stringify([["my-first-field", "test2"]]))
       sessionResume.restoreResumableFields('test-persist') 
-  
-      await Promise.resolve()
-
-      assert.deepEqual(changedFieldsIds, ['my-first-field'])
     })
   })
 

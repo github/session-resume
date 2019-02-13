@@ -42,7 +42,7 @@ export function persistResumableFields(id: string, {selector = '.js-session-resu
 
 type RestoreOptions = {|keyPrefix: string|}
 
-export async function restoreResumableFields(id: string, {keyPrefix = 'session-resume:'}: RestoreOptions = {}) {
+export function restoreResumableFields(id: string, {keyPrefix = 'session-resume:'}: RestoreOptions = {}) {
   const key = `${keyPrefix}${id}`
   let fields
 
@@ -82,17 +82,19 @@ export async function restoreResumableFields(id: string, {keyPrefix = 'session-r
     }
   }
 
-  await Promise.resolve()
-
-  for (const el of changedFields) {
-    el.dispatchEvent(new CustomEvent('change', {bubbles: true, cancelable: true}))
-  }
+  setTimeout(function() {
+    for (const el of changedFields) {
+      el.dispatchEvent(new CustomEvent('change', {bubbles: true, cancelable: true}))
+    }
+  }, 0)
 }
 
-export async function setForm(event: Event) {
+export function setForm(event: Event) {
   submittedForm = event.target
-  await Promise.resolve()
-  if (event.defaultPrevented) {
-    submittedForm = null
-  }
+
+  setTimeout(function() {
+    if (event.defaultPrevented) {
+      submittedForm = null
+    }
+  }, 0)
 }
