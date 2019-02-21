@@ -6,7 +6,7 @@
   "module": "dist/session-resume.esm.js",
   "scripts": {
     "build": "rollup -c && cp session-resume.js.flow dist/session-resume.esm.js.flow && cp session-resume.js.flow dist/session-resume.umd.js.flow",
-    "lint": "github-lint && flow",
+    "lint": "github-lint",
     "test": "karma start karma.config.js",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean && npm run lint && mkdir dist",
