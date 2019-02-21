@@ -31,7 +31,6 @@ describe('session-resume', function() {
     })
 
     it('fires off change for changed fields', function(done) {
-      const changedFieldsIds = []
       for (const input of document.querySelectorAll('input')) {
         input.addEventListener('change', function(event) {
           done(assert.equal(event.target.id, 'my-first-field'))
