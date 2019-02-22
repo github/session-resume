@@ -19,7 +19,10 @@ function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement) {
 type PersistOptions = {|selector: string, keyPrefix: string|}
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
-export function persistResumableFields(id: string, {selector = '.js-session-resumable', keyPrefix = 'session-resume:'}: PersistOptions = {}) {
+export function persistResumableFields(
+  id: string,
+  {selector = '.js-session-resumable', keyPrefix = 'session-resume:'}: PersistOptions = {}
+) {
   const key = `${keyPrefix}${id}`
   const resumables = []
 

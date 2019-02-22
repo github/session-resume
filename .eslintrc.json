@@ -3,5 +3,24 @@
     "plugin:github/es6",
     "plugin:github/browser",
     "plugin:github/flow"
+  ],
+  "overrides": [
+    {
+      "files": "test/**/*.js",
+      "rules": {
+        "flowtype/require-valid-file-annotation": "off"
+      }
+    },
+    {
+      "files": "test/**/*.js",
+      "excludedFiles": "test/karma.config.js",
+      "env": {
+        "mocha": true
+      },
+      "globals": {
+        "assert": true,
+        "sessionResume": true
+      }
+    }
   ]
 }
