@@ -1,7 +1,7 @@
 module.exports = function(config) {
   config.set({
     frameworks: ['mocha', 'chai'],
-    files: ['./dist/session-resume.umd.js', 'test.js'],
+    files: ['../dist/session-resume.umd.js', 'test.js'],
     reporters: ['mocha'],
     port: 9876,
     colors: true,
