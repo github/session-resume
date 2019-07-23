@@ -65,15 +65,15 @@ export function restoreResumableFields(id: string, {keyPrefix = 'session-resume:
 
   const changedFields = []
 
-  for (const [id, value] of JSON.parse(fields)) {
+  for (const [fieldId, value] of JSON.parse(fields)) {
     const resumeEvent = new CustomEvent('session:resume', {
       bubbles: true,
       cancelable: true,
-      detail: {targetId: id, targetValue: value}
+      detail: {targetId: fieldId, targetValue: value}
     })
 
     if (document.dispatchEvent(resumeEvent)) {
-      const field = document.getElementById(id)
+      const field = document.getElementById(fieldId)
       if (
         field &&
         (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) &&
