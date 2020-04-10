@@ -1,3 +1,5 @@
+import {persistResumableFields, restoreResumableFields} from '../dist/index.js'
+
 describe('session-resume', function () {
   before(function () {
     document.body.innerHTML = `
@@ -12,7 +14,7 @@ describe('session-resume', function () {
   describe('restoreResumableFields', function () {
     it('restores fields values from session storage', function () {
       sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
-      sessionResume.restoreResumableFields('test-persist')
+      restoreResumableFields('test-persist')
 
       assert.equal(document.querySelector('#my-first-field').value, 'test2')
       assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
@@ -25,7 +27,7 @@ describe('session-resume', function () {
       })
 
       sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
-      sessionResume.restoreResumableFields('test-persist')
+      restoreResumableFields('test-persist')
 
       assert.deepEqual(fieldsRestored, {'my-first-field': 'test2'})
     })
@@ -38,7 +40,7 @@ describe('session-resume', function () {
       }
 
       sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
-      sessionResume.restoreResumableFields('test-persist')
+      restoreResumableFields('test-persist')
     })
   })
 
@@ -46,7 +48,7 @@ describe('session-resume', function () {
     it('persist fields values to session storage', function () {
       document.querySelector('#my-first-field').value = 'test1'
       document.querySelector('#my-second-field').value = 'test2'
-      sessionResume.persistResumableFields('test-persist')
+      persistResumableFields('test-persist')
 
       assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
         ['my-first-field', 'test1'],

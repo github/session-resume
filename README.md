@@ -4,7 +4,7 @@ Annotate fields to be persisted on navigation away from the current page.
 Fields be automatically restored when the user revists the page again in
 their current browser session (excludes separate tabs).
 
-Not design for persisted crash recovery.
+Not designed for persisted crash recovery.
 
 ## Installation
 

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "es2015",
+    "target": "es2018",
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist",
+    "removeComments": true
+  },
+  "files": [
+    "src/index.ts"
+  ]
+}
