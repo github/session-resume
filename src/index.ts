@@ -1,28 +1,16 @@
-/* @flow strict */
-
-// Session Resume
-//
-// Annotate fields to be persisted on navigation away from the current page.
-// Fields be automatically restored when the user revists the page again in
-// their current browser session (excludes seperate tabs).
-//
-// Not design for persisted crash recovery.
-//
-
-// Last submitted HTMLFormElement that will cause a browser navigation
-let submittedForm = null
+// Last submitted HTMLFormElement that will cause a browser navigation.
+let submittedForm: HTMLFormElement | null = null
 
 function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement) {
   return field.id && field.value !== field.defaultValue && field.form !== submittedForm
 }
 
-type PersistOptions = {|selector: string, keyPrefix: string|}
+type PersistOptions = {selector?: string; keyPrefix?: string}
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
-export function persistResumableFields(
-  id: string,
-  {selector = '.js-session-resumable', keyPrefix = 'session-resume:'}: PersistOptions = {}
-) {
+export function persistResumableFields(id: string, options?: PersistOptions) {
+  const selector = options?.selector ?? '.js-session-resumable'
+  const keyPrefix = options?.keyPrefix ?? 'session-resume:'
   const key = `${keyPrefix}${id}`
   const resumables = []
 
@@ -37,21 +25,22 @@ export function persistResumableFields(
   if (fields.length) {
     try {
       sessionStorage.setItem(key, JSON.stringify(fields))
-    } catch (error) {
+    } catch {
       // Ignore browser private mode error.
     }
   }
 }
 
-type RestoreOptions = {|keyPrefix: string|}
+type RestoreOptions = {keyPrefix?: string}
 
-export function restoreResumableFields(id: string, {keyPrefix = 'session-resume:'}: RestoreOptions = {}) {
+export function restoreResumableFields(id: string, options?: RestoreOptions) {
+  const keyPrefix = options?.keyPrefix ?? 'session-resume:'
   const key = `${keyPrefix}${id}`
   let fields
 
   try {
     fields = sessionStorage.getItem(key)
-  } catch (error) {
+  } catch {
     // Ignore browser private mode error.
   }
 
@@ -59,11 +48,11 @@ export function restoreResumableFields(id: string, {keyPrefix = 'session-resume:
 
   try {
     sessionStorage.removeItem(key)
-  } catch (error) {
+  } catch {
     // Ignore browser private mode error.
   }
 
-  const changedFields = []
+  const changedFields: Array<HTMLInputElement | HTMLTextAreaElement> = []
 
   for (const [fieldId, value] of JSON.parse(fields)) {
     const resumeEvent = new CustomEvent('session:resume', {
@@ -93,7 +82,7 @@ export function restoreResumableFields(id: string, {keyPrefix = 'session-resume:
 }
 
 export function setForm(event: Event) {
-  submittedForm = event.target
+  submittedForm = event.target as HTMLFormElement
 
   setTimeout(function () {
     if (event.defaultPrevented) {
