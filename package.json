@@ -1,6 +1,6 @@
 {
   "name": "@github/session-resume",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "Annotate fields to be persisted on navigation away from the current page.",
   "main": "dist/umd/index.js",
   "module": "dist/index.js",
