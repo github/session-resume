@@ -1,5 +1,5 @@
-describe('session-resume', function() {
-  before(function() {
+describe('session-resume', function () {
+  before(function () {
     document.body.innerHTML = `
       <form>
         <input id="my-first-field" value="first-field-value" class="js-session-resumable" />
@@ -9,8 +9,8 @@ describe('session-resume', function() {
     window.addEventListener('submit', sessionStorage.setForm, {capture: true})
   })
 
-  describe('restoreResumableFields', function() {
-    it('restores fields values from session storage', function() {
+  describe('restoreResumableFields', function () {
+    it('restores fields values from session storage', function () {
       sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
       sessionResume.restoreResumableFields('test-persist')
 
@@ -18,9 +18,9 @@ describe('session-resume', function() {
       assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
     })
 
-    it('fires off session:resume events for changed fields', function() {
+    it('fires off session:resume events for changed fields', function () {
       const fieldsRestored = {}
-      document.addEventListener('session:resume', function(event) {
+      document.addEventListener('session:resume', function (event) {
         fieldsRestored[event.detail.targetId] = event.detail.targetValue
       })
 
@@ -30,9 +30,9 @@ describe('session-resume', function() {
       assert.deepEqual(fieldsRestored, {'my-first-field': 'test2'})
     })
 
-    it('fires off change for changed fields', function(done) {
+    it('fires off change for changed fields', function (done) {
       for (const input of document.querySelectorAll('input')) {
-        input.addEventListener('change', function(event) {
+        input.addEventListener('change', function (event) {
           done(assert.equal(event.target.id, 'my-first-field'))
         })
       }
@@ -42,8 +42,8 @@ describe('session-resume', function() {
     })
   })
 
-  describe('persistResumableFields', function() {
-    it('persist fields values to session storage', function() {
+  describe('persistResumableFields', function () {
+    it('persist fields values to session storage', function () {
       document.querySelector('#my-first-field').value = 'test1'
       document.querySelector('#my-second-field').value = 'test2'
       sessionResume.persistResumableFields('test-persist')

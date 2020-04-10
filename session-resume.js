@@ -85,7 +85,7 @@ export function restoreResumableFields(id: string, {keyPrefix = 'session-resume:
     }
   }
 
-  setTimeout(function() {
+  setTimeout(function () {
     for (const el of changedFields) {
       el.dispatchEvent(new CustomEvent('change', {bubbles: true, cancelable: true}))
     }
@@ -95,7 +95,7 @@ export function restoreResumableFields(id: string, {keyPrefix = 'session-resume:
 export function setForm(event: Event) {
   submittedForm = event.target
 
-  setTimeout(function() {
+  setTimeout(function () {
     if (event.defaultPrevented) {
       submittedForm = null
     }
