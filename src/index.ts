@@ -1,14 +1,14 @@
 // Last submitted HTMLFormElement that will cause a browser navigation.
 let submittedForm: HTMLFormElement | null = null
 
-function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement) {
-  return field.id && field.value !== field.defaultValue && field.form !== submittedForm
+function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement): boolean {
+  return !!field.id && field.value !== field.defaultValue && field.form !== submittedForm
 }
 
 type PersistOptions = {selector?: string; keyPrefix?: string}
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
-export function persistResumableFields(id: string, options?: PersistOptions) {
+export function persistResumableFields(id: string, options?: PersistOptions): void {
   const selector = options?.selector ?? '.js-session-resumable'
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
   const key = `${keyPrefix}${id}`
@@ -33,7 +33,7 @@ export function persistResumableFields(id: string, options?: PersistOptions) {
 
 type RestoreOptions = {keyPrefix?: string}
 
-export function restoreResumableFields(id: string, options?: RestoreOptions) {
+export function restoreResumableFields(id: string, options?: RestoreOptions): void {
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
   const key = `${keyPrefix}${id}`
   let fields
@@ -81,7 +81,7 @@ export function restoreResumableFields(id: string, options?: RestoreOptions) {
   }, 0)
 }
 
-export function setForm(event: Event) {
+export function setForm(event: Event): void {
   submittedForm = event.target as HTMLFormElement
 
   setTimeout(function () {
