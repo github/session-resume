@@ -46,13 +46,8 @@ export function restoreResumableFields(id: string, options?: RestoreOptions): vo
 
   if (!fields) return
 
-  try {
-    sessionStorage.removeItem(key)
-  } catch {
-    // Ignore browser private mode error.
-  }
-
   const changedFields: Array<HTMLInputElement | HTMLTextAreaElement> = []
+  const storedFieldsNotFound: string[][] = []
 
   for (const [fieldId, value] of JSON.parse(fields)) {
     const resumeEvent = new CustomEvent('session:resume', {
@@ -63,15 +58,28 @@ export function restoreResumableFields(id: string, options?: RestoreOptions): vo
 
     if (document.dispatchEvent(resumeEvent)) {
       const field = document.getElementById(fieldId)
-      if (
-        field &&
-        (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) &&
-        field.value === field.defaultValue
-      ) {
-        field.value = value
-        changedFields.push(field)
+      if (field && (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+        if (field.value === field.defaultValue) {
+          field.value = value
+          changedFields.push(field)
+        }
+      } else {
+        storedFieldsNotFound.push([fieldId, value])
       }
     }
+  }
+
+  // Some fields we want to restore are not always immediately present in the
+  // DOM and may be added later. This holds onto the values until
+  // they're needed.
+  if (storedFieldsNotFound.length === 0) {
+    try {
+      sessionStorage.removeItem(key)
+    } catch {
+      // Ignore browser private mode error.
+    }
+  } else {
+    sessionStorage.setItem(key, JSON.stringify(storedFieldsNotFound))
   }
 
   setTimeout(function () {
