@@ -24,7 +24,18 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
 
   if (fields.length) {
     try {
-      sessionStorage.setItem(key, JSON.stringify(fields))
+      const previouslyStoredFieldsJson = sessionStorage.getItem(key)
+      let allFields: string[][] = fields
+
+      if (previouslyStoredFieldsJson !== null) {
+        const previouslyStoredFields: string[][] = JSON.parse(previouslyStoredFieldsJson)
+        const fieldsNotReplaced: string[][] = previouslyStoredFields.filter(function (oldField) {
+          return !allFields.some(field => field[0] === oldField[0])
+        })
+        allFields = allFields.concat(fieldsNotReplaced)
+      }
+
+      sessionStorage.setItem(key, JSON.stringify(allFields))
     } catch {
       // Ignore browser private mode error.
     }

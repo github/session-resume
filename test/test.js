@@ -67,13 +67,22 @@ describe('session-resume', function () {
 
   describe('persistResumableFields', function () {
     it('persist fields values to session storage', function () {
+      sessionStorage.setItem(
+        'session-resume:test-persist',
+        JSON.stringify([
+          ['my-first-field', 'old data'],
+          ['non-existant-field', 'test3']
+        ])
+      )
       document.querySelector('#my-first-field').value = 'test1'
       document.querySelector('#my-second-field').value = 'test2'
+
       persistResumableFields('test-persist')
 
       assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
         ['my-first-field', 'test1'],
-        ['my-second-field', 'test2']
+        ['my-second-field', 'test2'],
+        ['non-existant-field', 'test3']
       ])
     })
   })
