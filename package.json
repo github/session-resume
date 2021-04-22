@@ -23,6 +23,7 @@
   "license": "MIT",
   "prettier": "@github/prettier-config",
   "eslintConfig": {
+    "root": true,
     "parser": "@typescript-eslint/parser",
     "extends": [
       "plugin:github/browser",
