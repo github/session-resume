@@ -20,6 +20,38 @@ describe('session-resume', function () {
       assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
     })
 
+    it('leaves unrestored values in session storage', function () {
+      sessionStorage.setItem(
+        'session-resume:test-persist',
+        JSON.stringify([
+          ['my-first-field', 'test2'],
+          ['non-existant-field', 'test3']
+        ])
+      )
+      document.querySelector('#my-first-field').value = 'first-field-value'
+      document.querySelector('#my-second-field').value = 'second-field-value'
+
+      restoreResumableFields('test-persist')
+
+      assert.equal(document.querySelector('#my-first-field').value, 'test2')
+      assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
+
+      // Some fields we want to restore are not always present in the DOM
+      // and may be added later. We hold onto the values until they're needed.
+      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
+        ['non-existant-field', 'test3']
+      ])
+    })
+
+    it('removes the sessionStore key when all the fields were found', function () {
+      sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
+      restoreResumableFields('test-persist')
+
+      // Some fields we want to restore are not always present in the DOM
+      // and may be added later. We hold onto the values until they're needed.
+      assert.equal(sessionStorage.getItem('session-resume:test-persist'), null)
+    })
+
     it('fires off session:resume events for changed fields', function () {
       const fieldsRestored = {}
       document.addEventListener('session:resume', function (event) {
@@ -48,6 +80,33 @@ describe('session-resume', function () {
     it('persist fields values to session storage', function () {
       document.querySelector('#my-first-field').value = 'test1'
       document.querySelector('#my-second-field').value = 'test2'
+      persistResumableFields('test-persist')
+
+      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
+        ['my-first-field', 'test1'],
+        ['my-second-field', 'test2']
+      ])
+    })
+
+    it('holds onto existing values in the store', function () {
+      sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['non-existant-field', 'test3']]))
+      document.querySelector('#my-first-field').value = 'test1'
+      document.querySelector('#my-second-field').value = 'test2'
+
+      persistResumableFields('test-persist')
+
+      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
+        ['my-first-field', 'test1'],
+        ['my-second-field', 'test2'],
+        ['non-existant-field', 'test3']
+      ])
+    })
+
+    it('replaces old values with the latest field values', function () {
+      sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'old data']]))
+      document.querySelector('#my-first-field').value = 'test1'
+      document.querySelector('#my-second-field').value = 'test2'
+
       persistResumableFields('test-persist')
 
       assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
