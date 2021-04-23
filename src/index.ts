@@ -20,22 +20,21 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
     }
   }
 
-  const fields = resumables.filter(field => shouldResumeField(field)).map(field => [field.id, field.value])
+  let fields = resumables.filter(field => shouldResumeField(field)).map(field => [field.id, field.value])
 
   if (fields.length) {
     try {
       const previouslyStoredFieldsJson = sessionStorage.getItem(key)
-      let allFields: string[][] = fields
 
       if (previouslyStoredFieldsJson !== null) {
         const previouslyStoredFields: string[][] = JSON.parse(previouslyStoredFieldsJson)
         const fieldsNotReplaced: string[][] = previouslyStoredFields.filter(function (oldField) {
-          return !allFields.some(field => field[0] === oldField[0])
+          return !fields.some(field => field[0] === oldField[0])
         })
-        allFields = allFields.concat(fieldsNotReplaced)
+        fields = fields.concat(fieldsNotReplaced)
       }
 
-      sessionStorage.setItem(key, JSON.stringify(allFields))
+      sessionStorage.setItem(key, JSON.stringify(fields))
     } catch {
       // Ignore browser private mode error.
     }
