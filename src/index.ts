@@ -9,10 +9,12 @@ type PersistOptions = {
   selector?: string
   keyPrefix?: string
   storage?: Pick<Storage, 'getItem' | 'setItem'>
+  scope?: ParentNode
 }
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
 export function persistResumableFields(id: string, options?: PersistOptions): void {
+  const scope = options?.scope ?? document
   const selector = options?.selector ?? '.js-session-resumable'
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
 
@@ -27,7 +29,7 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
   const key = `${keyPrefix}${id}`
   const resumables = []
 
-  for (const el of document.querySelectorAll(selector)) {
+  for (const el of scope.querySelectorAll(selector)) {
     if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
       resumables.push(el)
     }
