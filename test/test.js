@@ -8,6 +8,8 @@ describe('session-resume', function () {
       <form>
         <input id="my-first-field" value="first-field-value" class="js-session-resumable" />
         <input id="my-second-field" value="second-field-value" class="js-session-resumable" />
+        <input id="my-first-checkbox" type="checkbox" value="first-checkbox-value" class="js-session-resumable" />
+        <input id="my-second-checkbox" type="checkbox" value="second-checkbox-value" class="js-session-resumable" />
       </form>
     `
     window.addEventListener('submit', sessionStorage.setForm, {capture: true})
@@ -15,11 +17,19 @@ describe('session-resume', function () {
 
   describe('restoreResumableFields', function () {
     it('restores fields values from session storage by default', function () {
-      sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
+      sessionStorage.setItem(
+        'session-resume:test-persist',
+        JSON.stringify([
+          ['my-first-field', 'test2'],
+          ['my-first-checkbox', 'first-checkbox-value']
+        ])
+      )
       restoreResumableFields('test-persist')
 
       assert.equal(document.querySelector('#my-first-field').value, 'test2')
       assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
+      assert.equal(document.querySelector('#my-first-checkbox').checked, true)
+      assert.equal(document.querySelector('#my-second-checkbox').checked, false)
     })
 
     it('uses a Storage object when provided as an option', function () {
