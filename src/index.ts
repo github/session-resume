@@ -2,7 +2,12 @@
 let submittedForm: HTMLFormElement | null = null
 
 function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement, filter: StorageFilter): boolean {
-  return !!field.id && filter(field) && field.form !== submittedForm
+  return (
+    !!field.id &&
+    (field.value !== field.defaultValue ||
+      (field instanceof HTMLInputElement && field.checked !== field.defaultChecked)) &&
+    field.form !== submittedForm
+  )
 }
 
 function valueIsUnchanged(field: HTMLInputElement | HTMLTextAreaElement): boolean {
@@ -112,7 +117,10 @@ export function restoreResumableFields(id: string, options?: RestoreOptions): vo
     if (document.dispatchEvent(resumeEvent)) {
       const field = document.getElementById(fieldId)
       if (field && (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
-        if (field.value === field.defaultValue) {
+        if (field instanceof HTMLInputElement && (field.type === 'checkbox' || field.type === 'radio')) {
+          field.checked = true
+          changedFields.push(field)
+        } else if (field.value === field.defaultValue) {
           field.value = value
           changedFields.push(field)
         }
