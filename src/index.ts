@@ -118,7 +118,7 @@ export function restoreResumableFields(id: string, options?: RestoreOptions): vo
       const field = document.getElementById(fieldId)
       if (field && (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
         if (field instanceof HTMLInputElement && (field.type === 'checkbox' || field.type === 'radio')) {
-          field.checked = true
+          field.checked = !field.defaultChecked
           changedFields.push(field)
         } else if (field.value === field.defaultValue) {
           field.value = value
