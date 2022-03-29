@@ -1,7 +1,9 @@
+// eslint-disable-next-line import/no-unresolved, import/extensions
 import {persistResumableFields, restoreResumableFields} from '../dist/index.js'
 
 describe('session-resume', function () {
   before(function () {
+    // eslint-disable-next-line github/no-inner-html
     document.body.innerHTML = `
       <form>
         <input id="my-first-field" value="first-field-value" class="js-session-resumable" />
