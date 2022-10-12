@@ -5,7 +5,11 @@ function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement): boole
   return !!field.id && field.value !== field.defaultValue && field.form !== submittedForm
 }
 
-type PersistOptions = {selector?: string; keyPrefix?: string; storage?: Storage}
+type PersistOptions = {
+  selector?: string
+  keyPrefix?: string
+  storage?: Pick<Storage, 'getItem' | 'setItem'>
+}
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
 export function persistResumableFields(id: string, options?: PersistOptions): void {
@@ -42,7 +46,7 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
   }
 }
 
-type RestoreOptions = {keyPrefix?: string; storage?: Storage}
+type RestoreOptions = {keyPrefix?: string; storage?: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>}
 
 export function restoreResumableFields(id: string, options?: RestoreOptions): void {
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
