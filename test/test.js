@@ -14,9 +14,27 @@ describe('session-resume', function () {
   })
 
   describe('restoreResumableFields', function () {
-    it('restores fields values from session storage', function () {
+    it('restores fields values from session storage by default', function () {
       sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
       restoreResumableFields('test-persist')
+
+      assert.equal(document.querySelector('#my-first-field').value, 'test2')
+      assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
+    })
+
+    it('uses a Storage object when provided as an option', function () {
+      const fakeStorageBackend = {}
+      const fakeStorage = {
+        setItem(key, value) {
+          fakeStorageBackend[key] = JSON.stringify(value)
+        },
+        getItem(key) {
+          return JSON.parse(fakeStorageBackend[key] || null)
+        }
+      }
+
+      fakeStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
+      restoreResumableFields('test-persist', {storage: fakeStorage})
 
       assert.equal(document.querySelector('#my-first-field').value, 'test2')
       assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
@@ -79,12 +97,34 @@ describe('session-resume', function () {
   })
 
   describe('persistResumableFields', function () {
-    it('persist fields values to session storage', function () {
+    it('persist fields values to session storage by default', function () {
       document.querySelector('#my-first-field').value = 'test1'
       document.querySelector('#my-second-field').value = 'test2'
       persistResumableFields('test-persist')
 
       assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
+        ['my-first-field', 'test1'],
+        ['my-second-field', 'test2']
+      ])
+    })
+
+    it('uses a Storage object when provided as an option', function () {
+      document.querySelector('#my-first-field').value = 'test1'
+      document.querySelector('#my-second-field').value = 'test2'
+
+      const fakeStorageBackend = {}
+      const fakeStorage = {
+        setItem(key, value) {
+          fakeStorageBackend[key] = JSON.stringify(value)
+        },
+        getItem(key) {
+          return JSON.parse(fakeStorageBackend[key] || null)
+        }
+      }
+
+      persistResumableFields('test-persist', {storage: fakeStorage})
+
+      assert.deepEqual(JSON.parse(fakeStorage.getItem('session-resume:test-persist')), [
         ['my-first-field', 'test1'],
         ['my-second-field', 'test2']
       ])

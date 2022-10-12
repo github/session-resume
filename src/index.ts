@@ -5,12 +5,17 @@ function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement): boole
   return !!field.id && field.value !== field.defaultValue && field.form !== submittedForm
 }
 
-type PersistOptions = {selector?: string; keyPrefix?: string}
+type PersistOptions = {
+  selector?: string
+  keyPrefix?: string
+  storage?: Pick<Storage, 'getItem' | 'setItem'>
+}
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
 export function persistResumableFields(id: string, options?: PersistOptions): void {
   const selector = options?.selector ?? '.js-session-resumable'
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
+  const storage = options?.storage ?? sessionStorage
   const key = `${keyPrefix}${id}`
   const resumables = []
 
@@ -24,7 +29,7 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
 
   if (fields.length) {
     try {
-      const previouslyStoredFieldsJson = sessionStorage.getItem(key)
+      const previouslyStoredFieldsJson = storage.getItem(key)
 
       if (previouslyStoredFieldsJson !== null) {
         const previouslyStoredFields: string[][] = JSON.parse(previouslyStoredFieldsJson)
@@ -34,22 +39,23 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
         fields = fields.concat(fieldsNotReplaced)
       }
 
-      sessionStorage.setItem(key, JSON.stringify(fields))
+      storage.setItem(key, JSON.stringify(fields))
     } catch {
       // Ignore browser private mode error.
     }
   }
 }
 
-type RestoreOptions = {keyPrefix?: string}
+type RestoreOptions = {keyPrefix?: string; storage?: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>}
 
 export function restoreResumableFields(id: string, options?: RestoreOptions): void {
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
+  const storage = options?.storage ?? sessionStorage
   const key = `${keyPrefix}${id}`
   let fields
 
   try {
-    fields = sessionStorage.getItem(key)
+    fields = storage.getItem(key)
   } catch {
     // Ignore browser private mode error.
   }
@@ -84,12 +90,12 @@ export function restoreResumableFields(id: string, options?: RestoreOptions): vo
   // they're needed.
   if (storedFieldsNotFound.length === 0) {
     try {
-      sessionStorage.removeItem(key)
+      storage.removeItem(key)
     } catch {
       // Ignore browser private mode error.
     }
   } else {
-    sessionStorage.setItem(key, JSON.stringify(storedFieldsNotFound))
+    storage.setItem(key, JSON.stringify(storedFieldsNotFound))
   }
 
   setTimeout(function () {
