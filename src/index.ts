@@ -15,7 +15,15 @@ type PersistOptions = {
 export function persistResumableFields(id: string, options?: PersistOptions): void {
   const selector = options?.selector ?? '.js-session-resumable'
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
-  const storage = options?.storage ?? sessionStorage
+
+  let storage
+  try {
+    storage = options?.storage ?? sessionStorage
+  } catch {
+    // Ignore browser private mode error and return early
+    return
+  }
+
   const key = `${keyPrefix}${id}`
   const resumables = []
 
@@ -50,7 +58,15 @@ type RestoreOptions = {keyPrefix?: string; storage?: Pick<Storage, 'getItem' | '
 
 export function restoreResumableFields(id: string, options?: RestoreOptions): void {
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
-  const storage = options?.storage ?? sessionStorage
+
+  let storage
+  try {
+    storage = options?.storage ?? sessionStorage
+  } catch {
+    // Ignore browser private mode error and return early
+    return
+  }
+
   const key = `${keyPrefix}${id}`
   let fields
 
