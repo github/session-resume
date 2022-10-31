@@ -1,20 +1,28 @@
 // Last submitted HTMLFormElement that will cause a browser navigation.
 let submittedForm: HTMLFormElement | null = null
 
-function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement): boolean {
-  return !!field.id && field.value !== field.defaultValue && field.form !== submittedForm
+function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement, filter: StorageFilter): boolean {
+  return !!field.id && filter(field) && field.form !== submittedForm
 }
+
+function valueIsUnchanged(field: HTMLInputElement | HTMLTextAreaElement): boolean {
+  return field.value !== field.defaultValue
+}
+
+type StorageFilter = (field: HTMLInputElement | HTMLTextAreaElement) => boolean
 
 type PersistOptions = {
   selector?: string
   keyPrefix?: string
   storage?: Pick<Storage, 'getItem' | 'setItem'>
+  storageFilter?: StorageFilter
 }
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
 export function persistResumableFields(id: string, options?: PersistOptions): void {
   const selector = options?.selector ?? '.js-session-resumable'
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
+  const storageFilter = options?.storageFilter ?? valueIsUnchanged
 
   let storage
   try {
@@ -33,7 +41,7 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
     }
   }
 
-  let fields = resumables.filter(field => shouldResumeField(field)).map(field => [field.id, field.value])
+  let fields = resumables.filter(field => shouldResumeField(field, storageFilter)).map(field => [field.id, field.value])
 
   if (fields.length) {
     try {
