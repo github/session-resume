@@ -46,6 +46,27 @@ window.addEventListener('pagehide', function() {
 })
 ```
 
+#### `restoreResumableFields(id: string, options)`
+
+The `restoreResumableFields(id: string, options)` function supports optional configurations:
+
+* `storage:` - [`Storage`][] instance (defaults to [`window.sessionStorage`][])
+* `keyPrefix:` - `string` prepended onto the storage key (defaults to `"session-resume"`)
+
+[`Storage`]: https://developer.mozilla.org/en-US/docs/Web/API/Storage
+[`window.sessionStorage`]: https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
+
+#### `persistResumableFields(id: string, options)`
+
+The `persistResumableFields(id: string, options)` function supports optional configurations:
+
+* `storage:` - [`Storage`][] instance (defaults to [`window.sessionStorage`][])
+* `selector:` - `string` used to query field elements (defaults to `".js-session-resumable"`)
+* `keyPrefix:` - `string` prepended onto the storage key (defaults to `"session-resume"`)
+
+[`Storage`]: https://developer.mozilla.org/en-US/docs/Web/API/Storage
+[`window.sessionStorage`]: https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
+
 ## Development
 
 ```
