@@ -11,8 +11,19 @@ function valueIsUnchanged(field: HTMLInputElement | HTMLTextAreaElement): boolea
 
 type StorageFilter = (field: HTMLInputElement | HTMLTextAreaElement) => boolean
 
-type PersistOptions = {
+type PersistOptionsWithSelector = {
+  scope?: ParentNode
   selector?: string
+  fields?: never
+}
+
+type PersistOptionsWithFields = {
+  fields?: NodeList | Node[]
+  selector?: never
+  scope?: never
+}
+
+type PersistOptions = (PersistOptionsWithSelector | PersistOptionsWithFields) & {
   keyPrefix?: string
   storage?: Pick<Storage, 'getItem' | 'setItem'>
   storageFilter?: StorageFilter
@@ -20,7 +31,9 @@ type PersistOptions = {
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
 export function persistResumableFields(id: string, options?: PersistOptions): void {
+  const scope = options?.scope ?? document
   const selector = options?.selector ?? '.js-session-resumable'
+  const elements = options?.fields ?? scope.querySelectorAll(selector)
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
   const storageFilter = options?.storageFilter ?? valueIsUnchanged
 
@@ -35,7 +48,7 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
   const key = `${keyPrefix}${id}`
   const resumables = []
 
-  for (const el of document.querySelectorAll(selector)) {
+  for (const el of elements) {
     if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
       resumables.push(el)
     }

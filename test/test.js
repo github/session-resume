@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/no-unresolved, import/extensions
+// eslint-disable-next-line import/extensions, import/no-unresolved
 import {persistResumableFields, restoreResumableFields} from '../dist/index.js'
 
 describe('session-resume', function () {
@@ -153,6 +153,49 @@ describe('session-resume', function () {
 
       assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
         ['my-first-field', 'test1'],
+        ['my-second-field', 'test2']
+      ])
+    })
+
+    it('scopes fields based on the selector: option', function () {
+      document.getElementById('my-first-field').value = 'test1'
+      document.getElementById('my-second-field').value = 'test2'
+
+      sessionStorage.clear()
+      persistResumableFields('test-persist', {selector: '#my-first-field'})
+
+      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [['my-first-field', 'test1']])
+    })
+
+    it('scopes fields based on the scope: option', function () {
+      // eslint-disable-next-line github/no-inner-html
+      document.body.innerHTML = `
+        <form>
+          <input id="my-first-field" value="first-field-value" class="js-session-resumable" />
+          <input id="my-second-field" value="second-field-value" class="js-session-resumable" />
+        </form>
+        <input id="my-third-field" value="second-third-value" class="js-session-resumable" />
+      `
+      document.getElementById('my-first-field').value = 'test1'
+      document.getElementById('my-second-field').value = 'test2'
+      document.getElementById('my-third-field').value = 'test3'
+
+      sessionStorage.clear()
+      persistResumableFields('test-persist', {scope: document.querySelector('form')})
+
+      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
+        ['my-first-field', 'test1'],
+        ['my-second-field', 'test2']
+      ])
+    })
+    it('scopes fields based on the fields: option', function () {
+      document.getElementById('my-first-field').value = 'test1'
+      document.getElementById('my-second-field').value = 'test2'
+
+      sessionStorage.clear()
+      persistResumableFields('test-persist', {fields: document.querySelectorAll('#my-second-field')})
+
+      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
         ['my-second-field', 'test2']
       ])
     })
