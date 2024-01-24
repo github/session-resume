@@ -20,6 +20,7 @@ type PersistOptionsWithSelector = {
 type PersistOptionsWithFields = {
   fields?: NodeList | Node[]
   selector?: never
+  scope?: never
 }
 
 type PersistOptions = (PersistOptionsWithSelector | PersistOptionsWithFields) & {
