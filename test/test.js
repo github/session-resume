@@ -188,7 +188,7 @@ describe('session-resume', function () {
         ['my-second-field', 'test2']
       ])
     })
-    it('scopes fields based on the field: option', function () {
+    it('scopes fields based on the fields: option', function () {
       document.getElementById('my-first-field').value = 'test1'
       document.getElementById('my-second-field').value = 'test2'
 
