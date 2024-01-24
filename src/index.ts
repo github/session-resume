@@ -31,7 +31,7 @@ type PersistOptions = (PersistOptionsWithSelector | PersistOptionsWithFields) & 
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
 export function persistResumableFields(id: string, options?: PersistOptions): void {
-  const scope = options && 'scope' in options ? options.scope ?? document : document
+  const scope = options?.scope ?? document
   const selector = options?.selector ?? '.js-session-resumable'
   const elements = options?.fields ?? scope.querySelectorAll(selector)
   const keyPrefix = options?.keyPrefix ?? 'session-resume:'
