@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/extensions, import/no-unresolved
+// eslint-disable-next-line import/extensions
 import {persistResumableFields, restoreResumableFields} from '../dist/index.js'
 
 describe('session-resume', function () {
