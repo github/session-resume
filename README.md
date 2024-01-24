@@ -67,7 +67,7 @@ The `persistResumableFields(id: string, options)` function supports optional con
 * `selector:` - `string` used to query field elements (defaults to `".js-session-resumable"`)
 * `fields:` - `NodeList | Node[]` provide field elements as an alternative to querying (defaults to `options.scope.querySelectorAll(options.selector)`)
 
-**Note:** When combined, values passed as `fields:` will override options passed as `scope:` and `selector:`.
+**Note:** When `fields` is specified, `scope` and `selectors` will be ignored.
 
 [`Storage`]: https://developer.mozilla.org/en-US/docs/Web/API/Storage
 [`window.sessionStorage`]: https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
