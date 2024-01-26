@@ -97,14 +97,28 @@ describe('session-resume', function () {
       assert.deepEqual(fieldsRestored, {'my-first-field': 'test2'})
     })
 
-    it('fires off change for changed fields', function (done) {
-      for (const input of document.querySelectorAll('input')) {
+    it('fires off change for changed input[type=text] fields', function (done) {
+      for (const input of document.querySelectorAll('input[type=text]')) {
         input.addEventListener('change', function (event) {
           done(assert.equal(event.target.id, 'my-first-field'))
         })
       }
 
       sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
+      restoreResumableFields('test-persist')
+    })
+
+    it('fires off change for changed input[type=checkbox] fields', function (done) {
+      for (const input of document.querySelectorAll('input[type=checkbox]')) {
+        input.addEventListener('change', function (event) {
+          done(assert.equal(event.target.id, 'my-first-checkbox'))
+        })
+      }
+
+      sessionStorage.setItem(
+        'session-resume:test-persist',
+        JSON.stringify([['my-first-checkbox', 'first-checkbox-value']])
+      )
       restoreResumableFields('test-persist')
     })
   })

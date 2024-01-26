@@ -2,16 +2,15 @@
 let submittedForm: HTMLFormElement | null = null
 
 function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement, filter: StorageFilter): boolean {
-  return (
-    !!field.id &&
-    (field.value !== field.defaultValue ||
-      (field instanceof HTMLInputElement && field.checked !== field.defaultChecked)) &&
-    field.form !== submittedForm
-  )
+  return !!field.id && filter(field) && field.form !== submittedForm
 }
 
 function valueIsUnchanged(field: HTMLInputElement | HTMLTextAreaElement): boolean {
-  return field.value !== field.defaultValue
+  if (isHTMLCheckableInputElement(field)) {
+    return field.checked !== field.defaultChecked
+  } else {
+    return field.value !== field.defaultValue
+  }
 }
 
 type StorageFilter = (field: HTMLInputElement | HTMLTextAreaElement) => boolean
@@ -32,6 +31,16 @@ type PersistOptions = (PersistOptionsWithSelector | PersistOptionsWithFields) & 
   keyPrefix?: string
   storage?: Pick<Storage, 'getItem' | 'setItem'>
   storageFilter?: StorageFilter
+}
+
+type HTMLCheckableInputElement = HTMLInputElement & {
+  type: 'checkbox' | 'radio'
+}
+
+function isHTMLCheckableInputElement(
+  field: HTMLInputElement | HTMLTextAreaElement
+): field is HTMLCheckableInputElement {
+  return field instanceof HTMLInputElement && /checkbox|radio/.test(field.type)
 }
 
 // Write all ids and values of the selected fields on the page into sessionStorage.
@@ -117,7 +126,7 @@ export function restoreResumableFields(id: string, options?: RestoreOptions): vo
     if (document.dispatchEvent(resumeEvent)) {
       const field = document.getElementById(fieldId)
       if (field && (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
-        if (field instanceof HTMLInputElement && (field.type === 'checkbox' || field.type === 'radio')) {
+        if (isHTMLCheckableInputElement(field)) {
           field.checked = !field.defaultChecked
           changedFields.push(field)
         } else if (field.value === field.defaultValue) {
