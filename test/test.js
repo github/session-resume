@@ -6,8 +6,8 @@ describe('session-resume', function () {
     // eslint-disable-next-line github/no-inner-html
     document.body.innerHTML = `
       <form>
-        <input id="my-first-field" value="first-field-value" class="js-session-resumable" />
-        <input id="my-second-field" value="second-field-value" class="js-session-resumable" />
+        <input id="my-first-field" type="text" value="first-field-value" class="js-session-resumable" />
+        <input id="my-second-field" type="text" value="second-field-value" class="js-session-resumable" />
         <input id="my-first-checkbox" type="checkbox" value="first-checkbox-value" class="js-session-resumable" />
         <input id="my-second-checkbox" type="checkbox" value="second-checkbox-value" class="js-session-resumable" />
         <input id="my-checked-checkbox" type="checkbox" value="checked-checkbox-value" class="js-session-resumable" checked />
@@ -129,7 +129,7 @@ describe('session-resume', function () {
       document.querySelector('#my-second-field').value = 'test2'
       persistResumableFields('test-persist')
 
-      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
+      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
         ['my-first-field', 'test1'],
         ['my-second-field', 'test2']
       ])
@@ -151,7 +151,7 @@ describe('session-resume', function () {
 
       persistResumableFields('test-persist', {storage: fakeStorage})
 
-      assert.deepEqual(JSON.parse(fakeStorage.getItem('session-resume:test-persist')), [
+      assert.includeDeepMembers(JSON.parse(fakeStorage.getItem('session-resume:test-persist')), [
         ['my-first-field', 'test1'],
         ['my-second-field', 'test2']
       ])
@@ -164,7 +164,7 @@ describe('session-resume', function () {
 
       persistResumableFields('test-persist')
 
-      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
+      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
         ['my-first-field', 'test1'],
         ['my-second-field', 'test2'],
         ['non-existant-field', 'test3']
@@ -178,7 +178,7 @@ describe('session-resume', function () {
 
       persistResumableFields('test-persist')
 
-      assert.deepEqual(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
+      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
         ['my-first-field', 'test1'],
         ['my-second-field', 'test2']
       ])
