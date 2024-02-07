@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>session-resume demo</title>
+  <style>
+    fieldset {
+      margin-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>session-resume</h1>
+
+  <h2>Test by filling out the form and then refreshing the page or <a href="https://github.com">navigating away</a> and back.</h2>
+  
+  <form>
+    <p>
+        <label>Text input<br>
+            <input type="text" id="new-title" class="js-session-resumable"/>
+        </label>
+    </p>
+    <p>
+        <label>Email<br>
+            <input type="email" id="new-email" class="js-session-resumable"/>
+        </label>
+    </p>
+    <p>
+        <label>Number<br>
+            <input type="number" id="new-phone" class="js-session-resumable"/>
+        </label>
+    </p>
+    <p>
+        <label>Textarea<br>
+            <textarea id="new-comment" class="js-session-resumable"></textarea>
+        </label>
+    </p>
+    <fieldset>
+        <legend>Checkboxes</legend>
+        <div>
+            <input type="checkbox" id="ice-cream-vanilla" name="ice-cream" value="vanilla" class="js-session-resumable" checked />
+            <label for="ice-cream-vanilla">Vanilla (checked)</label><br>
+            <input type="checkbox" id="ice-cream-chocolate" name="ice-cream" value="chocolate" class="js-session-resumable" />
+            <label for="ice-cream-chocolate">Chocolate</label><br>
+            <input type="checkbox" id="ice-cream-strawberry" name="ice-cream" value="strawberry" class="js-session-resumable" />
+            <label for="ice-cream-strawberry">Strawberry</label>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Radio</legend>
+        <div>
+            <input type="radio" id="cake" name="cake-pie" value="cake" class="js-session-resumable" />
+            <label for="cake">Cake</label><br>
+            <input type="radio" id="pie" name="cake-pie" value="pie" class="js-session-resumable" />
+            <label for="pie">Pie</label>
+        </div>
+    </fieldset>
+
+    <button id="save-data" type="button">Set sessionStorage</button>
+  </form>
+
+  <script type="module">
+    // import {persistResumableFields, restoreResumableFields, setForm} from '../dist/index.js'
+    import {persistResumableFields, restoreResumableFields, setForm} from 'https://unpkg.com/@github/session-resume/dist/index.js'
+    
+    // Listen for all form submit events and to see if their default submission
+    // behavior is invoked.
+    window.addEventListener('submit', setForm, {capture: true})
+
+    // Resume field content on regular page loads.
+    window.addEventListener('pageshow', function() {
+        restoreResumableFields('session-resume-demo')
+    })
+
+    // Persist resumable fields when page is unloaded
+    window.addEventListener('pagehide', function() {
+        persistResumableFields('session-resume-demo')
+    })
+
+    document.addEventListener('click', function(event) {
+        if (event.target.id === 'save-data') {
+            persistResumableFields('session-resume-demo')
+        }
+    })
+  </script>
+</body>
+</html>

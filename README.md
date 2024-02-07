@@ -61,7 +61,7 @@ The `restoreResumableFields(id: string, options)` function supports optional con
 The `persistResumableFields(id: string, options)` function supports optional configurations:
 
 * `storage:` - [`Storage`][] instance (defaults to [`window.sessionStorage`][])
-* `storageFilter:` - `(field: HTMLInputElement | HTMLTextAreaElement) => boolean` predicate to determine whether or not to store a field (defaults to `(field) => field.value !== field.defaultValue`)
+* `storageFilter:` - `(field: HTMLInputElement | HTMLTextAreaElement) => boolean` predicate to determine whether or not to store a field (defaults to `(field) => field.checked !== field.defaultChecked)` for checkbox and radio buttons, `(field) => field.value !== field.defaultValue` otherwise)
 * `keyPrefix:` - `string` prepended onto the storage key (defaults to `"session-resume"`)
 * `scope:` - `ParentNode` used to query field elements (defaults to `document`)
 * `selector:` - `string` used to query field elements (defaults to `".js-session-resumable"`)
