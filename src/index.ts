@@ -1,19 +1,27 @@
 // Last submitted HTMLFormElement that will cause a browser navigation.
 let submittedForm: HTMLFormElement | null = null
 
-function shouldResumeField(field: HTMLInputElement | HTMLTextAreaElement, filter: StorageFilter): boolean {
+function shouldResumeField(field: PersistableElement, filter: StorageFilter): boolean {
   return !!field.id && filter(field) && field.form !== submittedForm
 }
 
-function valueIsUnchanged(field: HTMLInputElement | HTMLTextAreaElement): boolean {
-  if (isHTMLCheckableInputElement(field)) {
+function valueIsUnchanged(field: PersistableElement): boolean {
+  if (field instanceof HTMLSelectElement) {
+    return true
+  } else if (isHTMLCheckableInputElement(field)) {
     return field.checked !== field.defaultChecked
   } else {
     return field.value !== field.defaultValue
   }
 }
 
-type StorageFilter = (field: HTMLInputElement | HTMLTextAreaElement) => boolean
+function isPersistableElement(node: Node | null): node is PersistableElement {
+  return node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement || node instanceof HTMLSelectElement
+}
+
+type PersistableElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+
+type StorageFilter = (field: PersistableElement) => boolean
 
 type PersistOptionsWithSelector = {
   scope?: ParentNode
@@ -63,13 +71,20 @@ export function persistResumableFields(id: string, options?: PersistOptions): vo
   const resumables = []
 
   for (const el of elements) {
-    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+    if (isPersistableElement(el)) {
       resumables.push(el)
     }
   }
 
-  let fields = resumables.filter(field => shouldResumeField(field, storageFilter)).map(field => [field.id, field.value])
-
+  let fields = resumables
+    .filter(field => shouldResumeField(field, storageFilter))
+    .map(field => {
+      if (field instanceof HTMLSelectElement) {
+        return [field.id, Array.from(field.selectedOptions).map(option => option.value)]
+      } else {
+        return [field.id, field.value]
+      }
+    })
   if (fields.length) {
     try {
       const previouslyStoredFieldsJson = storage.getItem(key)
@@ -113,7 +128,7 @@ export function restoreResumableFields(id: string, options?: RestoreOptions): vo
 
   if (!fields) return
 
-  const changedFields: Array<HTMLInputElement | HTMLTextAreaElement> = []
+  const changedFields: PersistableElement[] = []
   const storedFieldsNotFound: string[][] = []
 
   for (const [fieldId, value] of JSON.parse(fields)) {
@@ -125,8 +140,13 @@ export function restoreResumableFields(id: string, options?: RestoreOptions): vo
 
     if (document.dispatchEvent(resumeEvent)) {
       const field = document.getElementById(fieldId)
-      if (field && (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
-        if (isHTMLCheckableInputElement(field)) {
+      if (isPersistableElement(field)) {
+        if (field instanceof HTMLSelectElement) {
+          for (const option of field.options) {
+            option.selected = value.includes(option.value)
+          }
+          changedFields.push(field)
+        } else if (isHTMLCheckableInputElement(field)) {
           field.checked = !field.defaultChecked
           changedFields.push(field)
         } else if (field.value === field.defaultValue) {
