@@ -35,14 +35,14 @@ function getPageID() {
 // behavior is invoked.
 window.addEventListener('submit', setForm, {capture: true})
 
-// Resume field content on regular page loads.
-window.addEventListener('pageshow', function() {
-  restoreResumableFields(getPageID())
-})
-
-// Persist resumable fields when page is unloaded
-window.addEventListener('pagehide', function() {
-  persistResumableFields(getPageID())
+window.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') {
+    // Resume field content on regular page loads.
+    restoreResumableFields(getPageID())
+  } else {
+    // Persist resumable fields when page is unloaded
+    persistResumableFields(getPageID())
+  }
 })
 ```
 
