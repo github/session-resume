@@ -1,0 +1,9 @@
+{
+  "parser": "espree",
+  "parserOptions": {
+    "ecmaVersion": 8
+  },
+  "rules": {
+    "import/named": "off"
+  }
+}
