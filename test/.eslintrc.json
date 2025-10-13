@@ -3,10 +3,7 @@
   "parserOptions": {
     "ecmaVersion": 8
   },
-  "env": {
-    "mocha": true
-  },
-  "globals": {
-    "assert": true
+  "rules": {
+    "import/named": "off"
   }
 }

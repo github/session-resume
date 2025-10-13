@@ -1,8 +1,9 @@
+import {describe, it, beforeAll, expect} from 'vitest'
 // eslint-disable-next-line import/extensions
-import {persistResumableFields, restoreResumableFields} from '../dist/index.js'
+import {persistResumableFields, restoreResumableFields} from '../src/index.ts'
 
 describe('session-resume', function () {
-  before(function () {
+  beforeAll(function () {
     // eslint-disable-next-line github/no-inner-html
     document.body.innerHTML = `
       <form>
@@ -38,14 +39,14 @@ describe('session-resume', function () {
       )
       restoreResumableFields('test-persist')
 
-      assert.equal(document.querySelector('#my-first-field').value, 'test2')
-      assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
-      assert.equal(document.querySelector('#my-first-checkbox').checked, true)
-      assert.equal(document.querySelector('#my-second-checkbox').checked, false)
-      assert.equal(document.querySelector('#my-checked-checkbox').checked, false)
-      assert.equal(document.querySelector('#my-single-select-field').value, 'second')
-      assert.equal(document.querySelector('#my-multiple-select-field option[value=first]').selected, true)
-      assert.equal(document.querySelector('#my-multiple-select-field option[value=second]').selected, true)
+      expect(document.querySelector('#my-first-field').value).toBe('test2')
+      expect(document.querySelector('#my-second-field').value).toBe('second-field-value')
+      expect(document.querySelector('#my-first-checkbox').checked).toBe(true)
+      expect(document.querySelector('#my-second-checkbox').checked).toBe(false)
+      expect(document.querySelector('#my-checked-checkbox').checked).toBe(false)
+      expect(document.querySelector('#my-single-select-field').value).toBe('second')
+      expect(document.querySelector('#my-multiple-select-field option[value=first]').selected).toBe(true)
+      expect(document.querySelector('#my-multiple-select-field option[value=second]').selected).toBe(true)
     })
 
     it('uses a Storage object when provided as an option', function () {
@@ -69,11 +70,11 @@ describe('session-resume', function () {
       )
       restoreResumableFields('test-persist', {storage: fakeStorage})
 
-      assert.equal(document.querySelector('#my-first-field').value, 'test2')
-      assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
-      assert.equal(document.querySelector('#my-single-select-field').value, 'second')
-      assert.equal(document.querySelector('#my-multiple-select-field option[value=first]').selected, true)
-      assert.equal(document.querySelector('#my-multiple-select-field option[value=second]').selected, true)
+      expect(document.querySelector('#my-first-field').value).toBe('test2')
+      expect(document.querySelector('#my-second-field').value).toBe('second-field-value')
+      expect(document.querySelector('#my-single-select-field').value).toBe('second')
+      expect(document.querySelector('#my-multiple-select-field option[value=first]').selected).toBe(true)
+      expect(document.querySelector('#my-multiple-select-field option[value=second]').selected).toBe(true)
     })
 
     it('leaves unrestored values in session storage', function () {
@@ -89,14 +90,14 @@ describe('session-resume', function () {
 
       restoreResumableFields('test-persist')
 
-      assert.equal(document.querySelector('#my-first-field').value, 'test2')
-      assert.equal(document.querySelector('#my-second-field').value, 'second-field-value')
+      expect(document.querySelector('#my-first-field').value).toBe('test2')
+      expect(document.querySelector('#my-second-field').value).toBe('second-field-value')
 
       // Some fields we want to restore are not always present in the DOM
       // and may be added later. We hold onto the values until they're needed.
-      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
-        ['non-existant-field', 'test3']
-      ])
+      expect(JSON.parse(sessionStorage.getItem('session-resume:test-persist'))).toEqual(
+        expect.arrayContaining([['non-existant-field', 'test3']])
+      )
     })
 
     it('removes the sessionStore key when all the fields were found', function () {
@@ -105,7 +106,7 @@ describe('session-resume', function () {
 
       // Some fields we want to restore are not always present in the DOM
       // and may be added later. We hold onto the values until they're needed.
-      assert.equal(sessionStorage.getItem('session-resume:test-persist'), null)
+      expect(sessionStorage.getItem('session-resume:test-persist')).toBe(null)
     })
 
     it('fires off session:resume events for changed fields', function () {
@@ -117,32 +118,38 @@ describe('session-resume', function () {
       sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
       restoreResumableFields('test-persist')
 
-      assert.deepEqual(fieldsRestored, {'my-first-field': 'test2'})
+      expect(fieldsRestored).toEqual({'my-first-field': 'test2'})
     })
 
-    it('fires off change for changed input[type=text] fields', function (done) {
-      for (const input of document.querySelectorAll('input[type=text]')) {
-        input.addEventListener('change', function (event) {
-          done(assert.equal(event.target.id, 'my-first-field'))
-        })
-      }
+    it('fires off change for changed input[type=text] fields', function () {
+      return new Promise(resolve => {
+        for (const input of document.querySelectorAll('input[type=text]')) {
+          input.addEventListener('change', function (event) {
+            expect(event.target.id).toBe('my-first-field')
+            resolve()
+          })
+        }
 
-      sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
-      restoreResumableFields('test-persist')
+        sessionStorage.setItem('session-resume:test-persist', JSON.stringify([['my-first-field', 'test2']]))
+        restoreResumableFields('test-persist')
+      })
     })
 
-    it('fires off change for changed input[type=checkbox] fields', function (done) {
-      for (const input of document.querySelectorAll('input[type=checkbox]')) {
-        input.addEventListener('change', function (event) {
-          done(assert.equal(event.target.id, 'my-first-checkbox'))
-        })
-      }
+    it('fires off change for changed input[type=checkbox] fields', function () {
+      return new Promise(resolve => {
+        for (const input of document.querySelectorAll('input[type=checkbox]')) {
+          input.addEventListener('change', function (event) {
+            expect(event.target.id).toBe('my-first-checkbox')
+            resolve()
+          })
+        }
 
-      sessionStorage.setItem(
-        'session-resume:test-persist',
-        JSON.stringify([['my-first-checkbox', 'first-checkbox-value']])
-      )
-      restoreResumableFields('test-persist')
+        sessionStorage.setItem(
+          'session-resume:test-persist',
+          JSON.stringify([['my-first-checkbox', 'first-checkbox-value']])
+        )
+        restoreResumableFields('test-persist')
+      })
     })
   })
 
@@ -155,12 +162,14 @@ describe('session-resume', function () {
       document.querySelector('#my-multiple-select-field option[value=second]').selected = true
       persistResumableFields('test-persist')
 
-      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
-        ['my-first-field', 'test1'],
-        ['my-second-field', 'test2'],
-        ['my-single-select-field', ['first']],
-        ['my-multiple-select-field', ['first', 'second']]
-      ])
+      expect(JSON.parse(sessionStorage.getItem('session-resume:test-persist'))).toEqual(
+        expect.arrayContaining([
+          ['my-first-field', 'test1'],
+          ['my-second-field', 'test2'],
+          ['my-single-select-field', ['first']],
+          ['my-multiple-select-field', ['first', 'second']]
+        ])
+      )
     })
 
     it('uses a Storage object when provided as an option', function () {
@@ -182,12 +191,14 @@ describe('session-resume', function () {
 
       persistResumableFields('test-persist', {storage: fakeStorage})
 
-      assert.includeDeepMembers(JSON.parse(fakeStorage.getItem('session-resume:test-persist')), [
-        ['my-first-field', 'test1'],
-        ['my-second-field', 'test2'],
-        ['my-single-select-field', ['second']],
-        ['my-multiple-select-field', ['first', 'second']]
-      ])
+      expect(JSON.parse(fakeStorage.getItem('session-resume:test-persist'))).toEqual(
+        expect.arrayContaining([
+          ['my-first-field', 'test1'],
+          ['my-second-field', 'test2'],
+          ['my-single-select-field', ['second']],
+          ['my-multiple-select-field', ['first', 'second']]
+        ])
+      )
     })
 
     it('holds onto existing values in the store', function () {
@@ -200,13 +211,15 @@ describe('session-resume', function () {
 
       persistResumableFields('test-persist')
 
-      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
-        ['my-first-field', 'test1'],
-        ['my-second-field', 'test2'],
-        ['my-single-select-field', ['second']],
-        ['my-multiple-select-field', ['first', 'second']],
-        ['non-existant-field', 'test3']
-      ])
+      expect(JSON.parse(sessionStorage.getItem('session-resume:test-persist'))).toEqual(
+        expect.arrayContaining([
+          ['my-first-field', 'test1'],
+          ['my-second-field', 'test2'],
+          ['my-single-select-field', ['second']],
+          ['my-multiple-select-field', ['first', 'second']],
+          ['non-existant-field', 'test3']
+        ])
+      )
     })
 
     it('replaces old values with the latest field values', function () {
@@ -227,12 +240,14 @@ describe('session-resume', function () {
 
       persistResumableFields('test-persist')
 
-      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
-        ['my-first-field', 'test1'],
-        ['my-second-field', 'test2'],
-        ['my-single-select-field', ['second']],
-        ['my-multiple-select-field', ['second']]
-      ])
+      expect(JSON.parse(sessionStorage.getItem('session-resume:test-persist'))).toEqual(
+        expect.arrayContaining([
+          ['my-first-field', 'test1'],
+          ['my-second-field', 'test2'],
+          ['my-single-select-field', ['second']],
+          ['my-multiple-select-field', ['second']]
+        ])
+      )
     })
 
     it('scopes fields based on the selector: option', function () {
@@ -242,9 +257,9 @@ describe('session-resume', function () {
       sessionStorage.clear()
       persistResumableFields('test-persist', {selector: '#my-first-field'})
 
-      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
-        ['my-first-field', 'test1']
-      ])
+      expect(JSON.parse(sessionStorage.getItem('session-resume:test-persist'))).toEqual(
+        expect.arrayContaining([['my-first-field', 'test1']])
+      )
     })
 
     it('scopes fields based on the scope: option', function () {
@@ -263,10 +278,12 @@ describe('session-resume', function () {
       sessionStorage.clear()
       persistResumableFields('test-persist', {scope: document.querySelector('form')})
 
-      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
-        ['my-first-field', 'test1'],
-        ['my-second-field', 'test2']
-      ])
+      expect(JSON.parse(sessionStorage.getItem('session-resume:test-persist'))).toEqual(
+        expect.arrayContaining([
+          ['my-first-field', 'test1'],
+          ['my-second-field', 'test2']
+        ])
+      )
     })
 
     it('scopes fields based on the fields: option', function () {
@@ -276,9 +293,9 @@ describe('session-resume', function () {
       sessionStorage.clear()
       persistResumableFields('test-persist', {fields: document.querySelectorAll('#my-second-field')})
 
-      assert.includeDeepMembers(JSON.parse(sessionStorage.getItem('session-resume:test-persist')), [
-        ['my-second-field', 'test2']
-      ])
+      expect(JSON.parse(sessionStorage.getItem('session-resume:test-persist'))).toEqual(
+        expect.arrayContaining([['my-second-field', 'test2']])
+      )
     })
   })
 })
